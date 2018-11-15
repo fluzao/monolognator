@@ -10,7 +10,7 @@ from weather import chuva
 logger = logging.getLogger(__name__)
 
 
-engine = create_engine('mysql+mysqlconnector://root:feio2801@172.17.0.2/bot',
+engine = create_engine('mysql+mysqlconnector://root:root@172.17.0.2/bot',
                        encoding='utf8',
                        echo=False,
                        echo_pool=False)
