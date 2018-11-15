@@ -3,7 +3,7 @@ import telegram
 import random
 import logging
 import re
-
+from db import log_message
 from gif import send_random_tenor
 
 logger = logging.getLogger(__name__)
@@ -127,6 +127,18 @@ def handle_counter(bot, update):
     chat = update.message.chat_id
     logger.info(f'Msg on {update.message.chat.title}({chat})'
                 f' from {update.message.from_user.first_name}({user}): {update.message.text}')
+    log_message(update.message.message_id,
+                chat,
+                user,
+                0,
+                update.message.from_user.username,
+                update.message.from_user.first_name,
+                update.message.from_user.last_name,
+                update.message.date,
+                update.message.chat.type,
+                update.message.text,
+                update.message.chat.title
+                )
 
     # If it's a new user or the count was reset earlier
     if chat not in counter or user not in counter[chat]:

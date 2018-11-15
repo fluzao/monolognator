@@ -1,4 +1,3 @@
-
 import telegram
 import logging
 import os
@@ -6,7 +5,7 @@ import requests
 import time
 import datetime
 from geopy import Nominatim
-from gif import get_random_giphy, search_tenor, inlinequery
+from gif import get_random_giphy
 
 logger = logging.getLogger(__name__)
 

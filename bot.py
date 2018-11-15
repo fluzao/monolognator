@@ -9,8 +9,9 @@ import beer
 from gif import get_random_giphy, search_tenor, inlinequery
 from monologue import query_limit, set_limit, handle_counter
 from weather import get_weather, chance_of_rain_today, chuva, chuva2, scheduled_weather, send_weather
+from schedule import add_schedule_command
 
-logging.basicConfig(level=logging.INFO,
+logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(funcName)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -61,6 +62,12 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
+def get_schedules():
+    token = os.getenv('telegram_token')
+    schedule = Updater(token)
+
+
+
 def main():
     method = os.getenv('update_method') or 'polling'
     token = os.getenv('telegram_token')
@@ -73,6 +80,8 @@ def main():
     updater.dispatcher.add_handler(CommandHandler('chuva', chuva))
     updater.dispatcher.add_handler(CommandHandler('chuva2', chuva2))
     updater.dispatcher.add_handler(CommandHandler('beer', beer_rating))
+    updater.dispatcher.add_handler(CommandHandler('schedule', add_schedule_command, pass_job_queue=True,
+                                                  pass_args=True))
     updater.dispatcher.add_handler(InlineQueryHandler(inlinequery))
     updater.dispatcher.add_error_handler(error)
     # updater.dispatcher.add_handler(MessageHandler(

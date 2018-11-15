@@ -20,13 +20,13 @@ def get_untappd(search):
         result = client.beer.info(beer_id)
 
         untappd_beer = {'name': result['response']['beer']['beer_name'],
-                    'label': result['response']['beer']['beer_label'],
-                    'abv': round(result['response']['beer']['beer_abv'], 2),
-                    'rating': round(result['response']['beer']['rating_score'], 2),
-                    'style': result['response']['beer']['beer_style'],
-                    'description': result['response']['beer']['beer_description'],
-                    'count': result['response']['beer']['rating_count'],
-                    'brewery': result['response']['beer']['brewery']['brewery_name']}
+                        'label': result['response']['beer']['beer_label'],
+                        'abv': round(result['response']['beer']['beer_abv'], 2),
+                        'rating': round(result['response']['beer']['rating_score'], 2),
+                        'style': result['response']['beer']['beer_style'],
+                        'description': result['response']['beer']['beer_description'],
+                        'count': result['response']['beer']['rating_count'],
+                        'brewery': result['response']['beer']['brewery']['brewery_name']}
         return untappd_beer
     except IndexError:
         return {}
