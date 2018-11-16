@@ -10,9 +10,9 @@ from weather import chuva
 logger = logging.getLogger(__name__)
 
 
-engine = create_engine('mysql+mysqlconnector://root:root@172.17.0.2/bot',
+engine = create_engine('mysql+mysqlconnector://root:root@localhost/bot',
                        encoding='utf8',
-                       echo=False,
+                       echo=True,
                        echo_pool=False)
 # Bind the engine to the metadata of the Base class so that the
 # declaratives can be accessed through a DBSession instance
@@ -56,7 +56,9 @@ def add_schedule(chat_id, user_id, name, schedule_type, interval, command, comma
         # chat = get_or_create(session, Chat, id=chat_id)
         user = session.query(User).filter(User.id == user_id).first()
         chat = session.query(Chat).filter(Chat.id == chat_id).first()
-        schedule = Schedule(chat, user, name, schedule_type, interval, command, command_arguments, content)
+        _schedule_type = session.query(ScheduleType).filter(ScheduleType.type == schedule_type).first()
+        _command = session.query(Command).filter(Command.name == command).first()
+        schedule = Schedule(chat, user, name, _schedule_type, interval, _command, command_arguments, content)
         session.add(schedule)
         session.commit()
     except (exc.SQLAlchemyError, exc.DBAPIError, exc.OperationalError, exc.DatabaseError) as e:
@@ -69,9 +71,9 @@ def add_schedule(chat_id, user_id, name, schedule_type, interval, command, comma
 def add_schedule_command(bot, update, job_queue, args):
     chat_id = update.message.chat_id
     user_id = update.message.from_user.id
-    name, schedule_type, interval, command, command_arguments, content = args.split(',')
-    add_schedule(chat_id, user_id, name, ScheduleType(type=schedule_type), interval, Command(name=command), command_arguments, content)
-    job_queue.run_once(chuva, int(interval))
+    name, schedule_type, interval, command, command_arguments, content = args
+    add_schedule(chat_id, user_id, name, schedule_type, interval, command, command_arguments, content)
+    # job_queue.run_once(chuva, int(interval))
     print(args)
 
 

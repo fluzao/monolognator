@@ -2,7 +2,7 @@ import mysql.connector
 
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, TIMESTAMP, BigInteger
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, TIMESTAMP, BigInteger, DATETIME, TIME
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -69,6 +69,9 @@ class ScheduleType(Base):
     id = Column(Integer, primary_key=True)
     type = Column(String(250), nullable=False)
 
+    def __int__(self, type):
+        self.type = type
+
 
 class Command(Base):
     __tablename__ = 'command'
@@ -89,21 +92,32 @@ class Schedule(Base):
     command_id = Column(Integer, ForeignKey('command.id'), nullable=False)
     command_arguments = Column(String(250), nullable=False)
     content = Column(String(250), nullable=True)
-    interval = Column(Integer, nullable=False)
+    when = Column(DATETIME, nullable=True)
+    time = Column(TIME, nullable=True)
+    interval = Column(Integer, nullable=True)
+    start_date = Column(DATETIME, nullable=True)
+    end_date = Column(DATETIME, nullable=True)
     chat = relationship(Chat)
     user = relationship(User)
     command = relationship(Command)
     schedule_type = relationship(ScheduleType)
 
-    def __init__(self, chat, user, name, schedule_type, interval, command, command_arguments, content):
+    def __init__(self, chat, user, name, schedule_type,
+                 command, command_arguments, content,
+                 when=None, time=None, interval=None,
+                 start_date=None, end_date=None):
         self.chat = chat
         self.user = user
         self.name = name
         self.schedule_type = schedule_type
-        self.interval = interval
         self.command = command
         self.command_arguments = command_arguments
         self.content = content
+        self.when = when
+        self.time = time
+        self.interval = interval
+        self.start_date = start_date
+        self.end_date = end_date
 
 
 
@@ -111,7 +125,7 @@ class Schedule(Base):
 
 def main():
 
-    engine = create_engine('mysql+mysqlconnector://root:root@172.17.0.2/bot',
+    engine = create_engine('mysql+mysqlconnector://root:root@localhost/bot',
                            encoding='utf8',
                            echo=True,
                            echo_pool=True)

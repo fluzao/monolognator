@@ -1,4 +1,4 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, InlineQueryHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, InlineQueryHandler, CallbackQueryHandler
 from telegram import MessageEntity
 import telegram
 import logging
@@ -10,8 +10,9 @@ from gif import get_random_giphy, search_tenor, inlinequery
 from monologue import query_limit, set_limit, handle_counter
 from weather import get_weather, chance_of_rain_today, chuva, chuva2, scheduled_weather, send_weather
 from schedule import add_schedule_command
+from schedule_menu import shit, main_menu, first_menu, second_menu
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(funcName)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -62,9 +63,13 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
-def get_schedules():
-    token = os.getenv('telegram_token')
-    schedule = Updater(token)
+def get_jobs(bot, update, job_queue):
+    jobs = job_queue.jobs()
+    for j in jobs:
+        print(j.name)
+
+def load_saved_jobs(bot, job, job_queue):
+    pass
 
 
 
@@ -80,9 +85,16 @@ def main():
     updater.dispatcher.add_handler(CommandHandler('chuva', chuva))
     updater.dispatcher.add_handler(CommandHandler('chuva2', chuva2))
     updater.dispatcher.add_handler(CommandHandler('beer', beer_rating))
+    updater.dispatcher.add_handler(CommandHandler('jobs', get_jobs, pass_job_queue=True))
+
     updater.dispatcher.add_handler(CommandHandler('schedule', add_schedule_command, pass_job_queue=True,
                                                   pass_args=True))
     updater.dispatcher.add_handler(InlineQueryHandler(inlinequery))
+    updater.dispatcher.add_handler(CommandHandler('shit', shit))
+
+    updater.dispatcher.add_handler(CallbackQueryHandler(main_menu, pattern='main'))
+    updater.dispatcher.add_handler(CallbackQueryHandler(first_menu, pattern='m1'))
+    updater.dispatcher.add_handler(CallbackQueryHandler(second_menu, pattern='m2'))
     updater.dispatcher.add_error_handler(error)
     # updater.dispatcher.add_handler(MessageHandler(
     #     Filters.text & (Filters.entity(MessageEntity.URL) |
