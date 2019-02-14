@@ -11,19 +11,70 @@ from gif import get_random_giphy, search_tenor, inlinequery
 logger = logging.getLogger(__name__)
 
 
+class Location(object):
+    def __init__(self, location):
+        self.location = location
+        self.geo = Nominatim(user_agent='Monolognator')
+        self.loc = self.geo.geocode(query={'city': location})
+
+    def lat(self):
+        return self.loc.latitude
+
+    def lon(self):
+        return self.loc.longitude
+
+    def address(self):
+        return self.loc.address
+
+    def name(self):
+        return self.loc.address.split(',')[0]
+
+    def weather(self):
+
+
+
+
+
+
+
+
+
+
+
+def get_geo(location):
+    logger.info(f'Querying Nominating for: {location}')
+    geo = Nominatim(user_agent='Monolognator')
+    try:
+        loc = geo.geocode(query={'city': location})
+    except Exception as e:
+        logger.error(f'Error getting geo location for {location}')
+        return e
+    else:
+        return loc
+
+
+
+
 
 # WEATHER
 def get_weather(location='London'):
     logger.info(f'Getting weather for {location}')
-    geo = Nominatim(user_agent='Monolognator')
-    loc = geo.geocode(location)
-    latlon = f'{loc.latitude}, {loc.longitude}'
+    loc = Location(location)
+    try:
+        lat = loc.lat()
+        lon = loc.lon()
+    except Exception as e:
+        logger.error(f'Error getting geo location for {location}')
+        return e
     # location = '51.4975,-0.1357'
     key = os.getenv('darksky_token')
     params = {'units': 'si'}
-    re = requests.get(f'https://api.darksky.net/forecast/{key}/{latlon}', params=params)
-    results = re.json()
-    return results
+    try:
+        re = requests.get(f'https://api.darksky.net/forecast/{key}/{lat},{lon}', params=params)
+        results = re.json()
+        return results
+    except Exception as e:
+        return e
 
 
 
