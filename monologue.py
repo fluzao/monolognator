@@ -135,7 +135,6 @@ def handle_counter(bot, update):
                 update.message.from_user.first_name,
                 update.message.from_user.last_name,
                 update.message.date,
-                update.message.chat.type,
                 update.message.text,
                 update.message.chat.title
                 )

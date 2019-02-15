@@ -12,6 +12,7 @@ from monologue import query_limit, set_limit, handle_counter
 from weather import get_weather, chance_of_rain_today, chuva, chuva2, scheduled_weather, send_weather
 from schedule import add_schedule_command
 from schedule_menu import shit, main_menu, first_menu, second_menu
+from sentiment import sentiment
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(funcName)s - %(levelname)s - %(message)s')
@@ -92,6 +93,8 @@ def main():
                                                   pass_args=True))
     updater.dispatcher.add_handler(InlineQueryHandler(inlinequery))
     updater.dispatcher.add_handler(CommandHandler('shit', get_messages))
+    updater.dispatcher.add_handler(CommandHandler('sentiment', sentiment))
+
 
     updater.dispatcher.add_handler(CallbackQueryHandler(main_menu, pattern='main'))
     updater.dispatcher.add_handler(CallbackQueryHandler(first_menu, pattern='m1'))

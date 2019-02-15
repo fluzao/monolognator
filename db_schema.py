@@ -50,16 +50,16 @@ class Message(Base):
     chat_id = Column(BigInteger, ForeignKey('chat.id'), nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     date = Column(TIMESTAMP, nullable=False)
-    type = Column(String(250), nullable=False)
-    content = Column(String(250), nullable=False)
+    text = Column(String(250), nullable=False)
+    reply_to = Column(Integer, nullable=True)
     chat = relationship(Chat)
     user = relationship(User)
 
-    def __init__(self, id, date, type, content, chat, user):
+    def __init__(self, id, date, text, reply_to, chat, user):
         self.id = id
         self.date = date
-        self.type = type
-        self.content = content
+        self.text = text
+        self.reply_to = reply_to
         self.chat = chat
         self.user = user
 
@@ -146,6 +146,8 @@ def main():
         schedule_type = ScheduleType(type=st)
         session.add(schedule_type)
     session.commit()
+
+
 
 
 if __name__ == "__main__":
