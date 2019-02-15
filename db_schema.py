@@ -125,11 +125,11 @@ class Schedule(Base):
 
 def main():
 
-    engine = create_engine('mysql+mysqlconnector://root:root@localhost/bot',
+    engine = create_engine('mysql+mysqlconnector://bot:bot@localhost/bot',
                            encoding='utf8',
                            echo=True,
                            echo_pool=True)
-    # Base.metadata.drop_all(engine)
+    Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
     from sqlalchemy.orm import sessionmaker
     DBSession = sessionmaker(bind=engine)

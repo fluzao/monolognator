@@ -7,10 +7,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-engine = create_engine('mysql+mysqlconnector://root:root@localhost/bot',
+engine = create_engine('mysql+mysqlconnector://bot:bot@localhost/bot',
                        encoding='utf8',
-                       echo=False,
-                       echo_pool=False)
+                       echo=True,
+                       echo_pool=True)
 # Bind the engine to the metadata of the Base class so that the
 # declaratives can be accessed through a DBSession instance
 Base = declarative_base()
@@ -59,20 +59,26 @@ def log_message(id, chat_id, user_id, is_bot, username, first_name, last_name, d
         session.close()
 
 
+def get_messages(bot, update):
+    user = None
+    # user = update.message.from_user.id
+    chat = update.message.chat_id
+    try:
+        session = DBSession()
+    except exc.DatabaseError as e:
+        logger.error('Failed to get DB Session')
+        pass
+    try:
+        if user:
+            for msg in session.query(Message).filter(Message.user_id == user, Message.chat_id == chat):
+                print(msg.content)
+        else:
+            for msg in session.query(Message).filter(Message.chat_id == chat):
+                print(msg.content)
+    except (exc.SQLAlchemyError, exc.DBAPIError, exc.OperationalError, exc.DatabaseError) as e:
+        logger.error('Log message failed, rolling back')
+        session.rollback()
+    finally:
+        session.close()
 
-#log_message(session,
-#            11111, 22222, 33333, 0, 'bruno', 'bruno', 'savioli', '2018-11-14 01:00:53', 'lalala', 'content', 'test chat')
-
-
-
-#
-# # Insert a Person in the person table
-# new_person = Person(name='new person')
-# session.add(new_person)
-# session.commit()
-#
-# # Insert an Address in the address table
-# new_address = Address(post_code='00000', person=new_person)
-# session.add(new_address)
-# session.commit()
 
