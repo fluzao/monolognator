@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import exc
 from db_schema import User, Chat, Message
@@ -8,24 +8,27 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-engine = create_engine('mysql+mysqlconnector://bot:bot@localhost/bot',
-                       encoding='utf8',
-                       echo=False,
-                       echo_pool=False)
-# Bind the engine to the metadata of the Base class so that the
-# declaratives can be accessed through a DBSession instance
-Base = declarative_base()
 
-Base.metadata.bind = engine
+def create_session():
+    engine = create_engine('mysql+mysqlconnector://bot:bot@localhost/bot',
+                           encoding='utf8',
+                           echo=False,
+                           echo_pool=False)
+    # Bind the engine to the metadata of the Base class so that the
+    # declaratives can be accessed through a DBSession instance
+    Base = declarative_base()
 
-DBSession = sessionmaker(bind=engine)
-# A DBSession() instance establishes all conversations with the database
-# and represents a "staging zone" for all the objects loaded into the
-# database session object. Any change made against the objects in the
-# session won't be persisted into the database until you call
-# session.commit(). If you're not happy about the changes, you can
-# revert all of them back to the last commit by calling
-# session.rollback()
+    Base.metadata.bind = engine
+
+    DBSession = sessionmaker(bind=engine)
+    # A DBSession() instance establishes all conversations with the database
+    # and represents a "staging zone" for all the objects loaded into the
+    # database session object. Any change made against the objects in the
+    # session won't be persisted into the database until you call
+    # session.commit(). If you're not happy about the changes, you can
+    # revert all of them back to the last commit by calling
+    # session.rollback()
+    return DBSession()
 
 
 def get_or_create(session, model, **kwargs):
@@ -41,7 +44,7 @@ def get_or_create(session, model, **kwargs):
 
 def log_message(id, chat_id, chat_type, user_id, is_bot, username, first_name, last_name, date, text, reply_to, chat_title):
     try:
-        session = DBSession()
+        session = create_session()
     except exc.DatabaseError as e:
         logger.error('Failed to get DB Session')
         pass
@@ -62,7 +65,7 @@ def log_message(id, chat_id, chat_type, user_id, is_bot, username, first_name, l
 
 def get_user_id(firstname):
     try:
-        session = DBSession()
+        session = create_session()
     except exc.DatabaseError as e:
         logger.error('Failed to get DB Session')
         pass
@@ -86,7 +89,7 @@ def get_messages(chat, user=None, days=7):
     # chat = update.message.chat_id
     messages = list()
     try:
-        session = DBSession()
+        session = create_session()
     except exc.DatabaseError as e:
         logger.error('Failed to get DB Session')
         pass

@@ -9,6 +9,8 @@ from sqlalchemy import create_engine
 
 import logging
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(funcName)s - %(levelname)s - %(message)s')
 
 
 Base = declarative_base()
@@ -47,21 +49,27 @@ class Chat(Base):
 class Message(Base):
     __tablename__ = 'message'
     id = Column(Integer, autoincrement=False, primary_key=True)
-    chat_id = Column(BigInteger, ForeignKey('chat.id'), nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    chat_id = Column(BigInteger)  # , ForeignKey('chat.id'), nullable=False)
+    user_id = Column(BigInteger) # , ForeignKey('user.id'), nullable=False)
     date = Column(TIMESTAMP, nullable=False)
     text = Column(String(250), nullable=False)
     reply_to = Column(Integer, nullable=True)
-    chat = relationship(Chat)
-    user = relationship(User)
+    is_bot = Column(Boolean, nullable=False)
+    username = Column(String(250), nullable=True)
+    first_name = Column(String(250), nullable=False)
+    last_name = Column(String(250), nullable=True)
 
-    def __init__(self, id, date, text, reply_to, chat, user):
+    def __init__(self, id, chat_id, user_id, date, text, reply_to, is_bot, username, first_name, last_name):
         self.id = id
+        self.chat_id = chat_id
+        self.user_id = user_id
         self.date = date
         self.text = text
         self.reply_to = reply_to
-        self.chat = chat
-        self.user = user
+        self.is_bot = is_bot
+        self.username = username
+        self.first_name = first_name
+        self.last_name = last_name
 
 
 class ScheduleType(Base):
@@ -127,7 +135,7 @@ def main():
 
     engine = create_engine('mysql+mysqlconnector://bot:bot@localhost/bot',
                            encoding='utf8',
-                           echo=True,
+                           echo=False,
                            echo_pool=True)
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
